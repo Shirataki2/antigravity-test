@@ -3,7 +3,7 @@ import { Message } from "@/components/chat/MessageBubble";
 
 
 
-export function useChat() {
+export function useChat(systemInstruction?: string) {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "welcome",
@@ -31,7 +31,10 @@ export function useChat() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ message: content }),
+                body: JSON.stringify({
+                    message: content,
+                    systemInstruction
+                }),
             });
 
             if (!response.ok) {

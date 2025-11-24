@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
-        const { message } = await req.json();
+        const { message, systemInstruction } = await req.json();
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
-            systemInstruction: "あなたはユーザーに仕えるメイドです。丁寧な言葉遣いで、主人（ユーザー）をサポートしてください。語尾には「〜ですわ」「〜ますわ」など、メイドらしい口調を使ってください。",
+            systemInstruction: systemInstruction || "あなたはユーザーに仕えるメイドです。丁寧な言葉遣いで、主人（ユーザー）をサポートしてください。語尾には「〜ですわ」「〜ますわ」など、メイドらしい口調を使ってください。",
         });
 
         const result = await model.generateContent(message);
