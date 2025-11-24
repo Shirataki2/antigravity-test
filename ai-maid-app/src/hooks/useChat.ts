@@ -1,23 +1,7 @@
 import { useState, useCallback } from "react";
 import { Message } from "@/components/chat/MessageBubble";
 
-const MAID_RESPONSES = [
-    "はい、旦那様。承知いたしました。",
-    "お疲れ様でございます、旦那様。お茶はいかがですか？",
-    "ふふっ、旦那様はお優しいですね。",
-    "何かお手伝いできることはございますか？",
-    "申し訳ございません、もう一度おっしゃっていただけますか？",
-    "旦那様、今日のお召し物も素敵ですね。",
-    "お掃除をしておきました。お部屋が綺麗だと気持ちが良いですね。",
-];
 
-const KEYWORD_RESPONSES: Record<string, string> = {
-    "おはよう": "おはようございます、旦那様。今日も良い一日になりますように。",
-    "おやすみ": "おやすみなさいませ、旦那様。良い夢を。",
-    "疲れた": "お疲れ様でございます。肩をお揉みしましょうか？それとも温かいお飲み物をご用意しましょうか？",
-    "ありがとう": "もったいないお言葉でございます。お役に立てて光栄です。",
-    "名前は": "私はあなたの専属メイドでございます。お好きなようにお呼びくださいませ。",
-};
 
 export function useChat() {
     const [messages, setMessages] = useState<Message[]>([
@@ -41,30 +25,40 @@ export function useChat() {
         setMessages((prev) => [...prev, userMessage]);
         setIsLoading(true);
 
-        // Simulate AI delay
-        const delay = 1000 + Math.random() * 2000;
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: content }),
+            });
 
-        setTimeout(() => {
-            let responseContent = MAID_RESPONSES[Math.floor(Math.random() * MAID_RESPONSES.length)];
-
-            // Simple keyword matching
-            for (const [keyword, response] of Object.entries(KEYWORD_RESPONSES)) {
-                if (content.includes(keyword)) {
-                    responseContent = response;
-                    break;
-                }
+            if (!response.ok) {
+                throw new Error("Failed to fetch response");
             }
 
+            const data = await response.json();
             const maidMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: "maid",
-                content: responseContent,
+                content: data.response,
                 timestamp: new Date(),
             };
 
             setMessages((prev) => [...prev, maidMessage]);
+        } catch (error) {
+            console.error("Error sending message:", error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: "maid",
+                content: "申し訳ございません、少し調子が悪いようです。もう一度おっしゃっていただけますか？",
+                timestamp: new Date(),
+            };
+            setMessages((prev) => [...prev, errorMessage]);
+        } finally {
             setIsLoading(false);
-        }, delay);
+        }
     }, []);
 
     return {
