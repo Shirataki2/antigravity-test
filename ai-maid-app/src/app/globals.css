@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-maid-primary: #1a1a2e;
+  --color-maid-secondary: #f8f9fa;
+  --color-maid-accent: #800020;
+  --color-maid-gold: #d4af37;
+  --color-maid-bg: #f5f5f5;
+
+  --font-cinzel: var(--font-cinzel);
+  --font-inter: var(--font-inter);
+}
+
+:root {
+  --background: var(--color-maid-bg);
+  --foreground: var(--color-maid-primary);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-cinzel), serif;
+}
