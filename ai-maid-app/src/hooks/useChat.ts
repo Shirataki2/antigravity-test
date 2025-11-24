@@ -62,7 +62,7 @@ export function useChat(systemInstruction?: string) {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [systemInstruction]);
 
     return {
         messages,
